@@ -1,13 +1,12 @@
 <?php
 
-# Using WP admin_bar_menu hook 
+/**
+Using WP admin_bar_menu hook to add persistent menu
+*/
 add_action('admin_bar_menu', function($admin_bar) 
 {
   // Set menu parent label
   $admin_bar->add_menu(['id'=>'pgb','title'=>'Page Builder']);
-
-  // assign database table prefix to variable for use in loop eg: wp_
-  $pre = elementorPages()->prefix;
   
   // loop the array of pages source
   $elem_menu=[];
@@ -20,7 +19,7 @@ add_action('admin_bar_menu', function($admin_bar)
     if( empty($pgtitle) )
       continue;
 
-    // load array variable to use solely for count to define column display
+    // load array variable to use solely for count to define CSS column alignment
     $elem_menu[] = $pgtitle;
 
     // create sub menu items
@@ -49,7 +48,7 @@ add_action('admin_bar_menu', function($admin_bar)
 });
 
 
-/*
+/**
 Elementor hook to add pages menu to editor panel
 */
 add_action('elementor/documents/register_controls', function($document) 
@@ -75,7 +74,7 @@ add_action('elementor/documents/register_controls', function($document)
 	
 	// pages list HTML in panel
 	$document->start_controls_section('maax_document_pagelist',[
-	'tab' => $e::TAB_SETTING,
+	'tab' => $e::TAB_SETTINGS,
 	'label'=>'Pages'
 	]);
 		$pages = implode('',$pgmenu);
@@ -92,8 +91,8 @@ add_action('elementor/documents/register_controls', function($document)
 
 
 
-/*
-Get elementor pages
+/**
+Get elementor pages from database
 */
 function elementorPages($pid='')
 {
