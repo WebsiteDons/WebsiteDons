@@ -39,7 +39,7 @@ add_action('admin_bar_menu', function($admin_bar)
     $admin_bar->add_menu([
       'parent'=>'pgb',
       'id'    => 'pagebuilder-'.$pid,
-      'title' => ucfirst(cmse::truncText($pgtitle,20)),
+      'title' => ucfirst(truncText($pgtitle,20)),
       'href'  => 'post.php?post='.$pid.'&action=elementor',
     ]);
   }
@@ -59,3 +59,26 @@ add_action('admin_bar_menu', function($admin_bar)
     });
   }
 });
+
+
+/*
+Truncate function
+*/
+function truncText($text, $charcount, $keeptag='')
+{
+	// strip plugin content shortcodes eg: [video]
+	$text = preg_replace('#\[(.*?)\]#', '', $text);
+
+	$text = strip_tags($text, $keeptag);// $keeptag '<a><b><strong>' etc
+
+	if( strlen($text) > $charcount && $charcount != 0 )
+	{
+		$text = $text." ";
+		$text = substr($text,0,$charcount);
+		$text = substr($text,0,strrpos($text,' '));
+		if($charcount != 0) {
+		$text = $text." ...";
+		}
+	}
+	return $text;
+}
