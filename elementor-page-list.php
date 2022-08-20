@@ -1,3 +1,5 @@
+<?php
+
 # Using WP admin_bar_menu hook 
 add_action('admin_bar_menu', function($admin_bar) 
 {
@@ -146,28 +148,3 @@ function elementorPages($pid='')
   
   return $val;
 }
-
-
-/*
-CSS to be added to admin css file
-*/
-/*elementor page settings custom panel*/
-.panelpages a {
-	display: block; 
-	padding: 5px; 
-	border-bottom: 1px solid #2b2f33;
-}
-.panelpages .panelbtn {
-	background: #2b2f33; 
-	padding: 8px 6px; 
-	margin-top: 10px; 
-	border-radius: 3px; 
-	text-align: center;
-	border: none;
-}
-.panelpages .panelbtn:hover {
-	background: #111;
-}
-.panelpages h3 {
- margin-top: 30px; margin-bottom: 10px;
- }
