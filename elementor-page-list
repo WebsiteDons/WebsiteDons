@@ -1,1 +1,61 @@
-global $wpdb;
+# Using WP admin_bar_menu hook 
+add_action('admin_bar_menu', function($admin_bar) 
+{
+  // WP database connect global variable
+  global $wpdb;
+  $pre = $wpdb->prefix;
+
+  // get active pages created with elementor
+  $pgbuilder = $wpdb->get_results('
+  SELECT post_id
+  FROM $wpdb->postmeta
+  WHERE meta_key = "_elementor_edit_mode" 
+  ORDER BY post_id
+  ');
+
+  // Set menu parent label
+  $admin_bar->add_menu(['id'=>'pgb','title'=>'Page Builder']);
+
+  // loop the array of pages source
+  $elem_menu=[];
+  foreach($pgbuilder as $pgb) 
+  {
+    $pid = $pgb->post_id;
+    $pgtitle = $wpdb->get_var('
+    SELECT post_title 
+    FROM '.$pre.'posts 
+    WHERE (ID = '.$pid.' AND post_type = "page")
+    OR (ID = '.$pid.' AND post_type = "post")
+    ');
+    
+    // skip items without value
+    if( empty($pgtitle) )
+      continue;
+
+    // load array variable to use solely for count to define column display
+    $elem_menu[] = $pgtitle;
+
+    // create sub menu items
+    $admin_bar->add_menu([
+      'parent'=>'pgb',
+      'id'    => 'pagebuilder-'.$pid,
+      'title' => ucfirst(cmse::truncText($pgtitle,20)),
+      'href'  => 'post.php?post='.$pid.'&action=elementor',
+    ]);
+  }
+
+  // set css for menu column multiplication when the elementor page count exceeds 10
+  if( count((array)$elem_menu) > 10 ) 
+  {
+    add_action('admin_footer', function() {
+      $css = '<style>
+      ul#wp-admin-bar-pgb-default {
+        column-count: 3;
+        column-rule: 1px solid lightblue;
+      }
+      </style>';
+
+      echo $css;
+    });
+  }
+});
