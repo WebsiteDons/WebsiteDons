@@ -1,32 +1,18 @@
 # Using WP admin_bar_menu hook 
 add_action('admin_bar_menu', function($admin_bar) 
 {
-  // WP database connect global variable
-  global $wpdb;
-  $pre = $wpdb->prefix;
-
-  // get active pages created with elementor
-  $pgbuilder = $wpdb->get_results('
-  SELECT post_id
-  FROM $wpdb->postmeta
-  WHERE meta_key = "_elementor_edit_mode" 
-  ORDER BY post_id
-  ');
-
   // Set menu parent label
   $admin_bar->add_menu(['id'=>'pgb','title'=>'Page Builder']);
 
+  // assign database table prefix to variable for use in loop eg: wp_
+  $pre = elementorPages()->prefix;
+  
   // loop the array of pages source
   $elem_menu=[];
-  foreach($pgbuilder as $pgb) 
+  foreach(elementorPages()->pages as $pgb) 
   {
     $pid = $pgb->post_id;
-    $pgtitle = $wpdb->get_var('
-    SELECT post_title 
-    FROM '.$pre.'posts 
-    WHERE (ID = '.$pid.' AND post_type = "page")
-    OR (ID = '.$pid.' AND post_type = "post")
-    ');
+    $pgtitle = elementorPages($pid)->title;
     
     // skip items without value
     if( empty($pgtitle) )
@@ -40,7 +26,7 @@ add_action('admin_bar_menu', function($admin_bar)
       'parent'=>'pgb',
       'id'    => 'pagebuilder-'.$pid,
       'title' => ucfirst(truncText($pgtitle,20)),
-      'href'  => 'post.php?post='.$pid.'&action=elementor',
+      'href'  => admin_url('post.php?post='.$pid.'&action=elementor'),
     ]);
   }
 
@@ -81,4 +67,40 @@ function truncText($text, $charcount, $keeptag='')
 		}
 	}
 	return $text;
+}
+
+/*
+Get elementor pages
+*/
+function elementorPages($pid='')
+{
+  // WP database connect global variable
+  global $wpdb;
+
+  // get active pages created with elementor
+  $elementor_pages=[];
+  if( empty($pid) ) {
+    $elementor_pages = $wpdb->get_results('
+    SELECT post_id
+    FROM '.$wpdb->postmeta.'
+    WHERE meta_key = "_elementor_edit_mode" 
+    ORDER BY post_id
+    ');
+  }
+  $pgtitle='';
+  if( !empty($pid) ) {
+    $pgtitle = $wpdb->get_var('
+    SELECT post_title 
+    FROM '.$wpdb->prefix.'posts 
+    WHERE (ID = '.$pid.' AND post_type = "page")
+    OR (ID = '.$pid.' AND post_type = "post")
+    ');
+  }
+  
+  $val = (object)[
+  'pages' => $elementor_pages,
+  'title' => $pgtitle
+  ];
+  
+  return $val;
 }
