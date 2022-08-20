@@ -27,7 +27,7 @@ add_action('admin_bar_menu', function($admin_bar)
     $admin_bar->add_menu([
       'parent'=>'pgb',
       'id'    => 'pagebuilder-'.$pid,
-      'title' => ucfirst(truncText($pgtitle,20)),
+      'title' => ucfirst(wp_trim_words($pgtitle,5)),
       'href'  => admin_url('post.php?post='.$pid.'&action=elementor'),
     ]);
   }
@@ -68,7 +68,7 @@ add_action('elementor/documents/register_controls', function($document)
 
 		$url = admin_url('post.php?post='.$pid.'&action=elementor');
 		if( !empty($ptitle) ) {
-			$lbl = ucfirst(truncText($ptitle,30));
+			$lbl = ucfirst(wp_trim_words($ptitle,5));
 			$pgmenu[] = '<div><a href="'.$url.'">'.$lbl.'</a></div>';
 		}
 	}
@@ -91,27 +91,6 @@ add_action('elementor/documents/register_controls', function($document)
 });
 
 
-/*
-Truncate function
-*/
-function truncText($text, $charcount, $keeptag='')
-{
-	// strip plugin content shortcodes eg: [video]
-	$text = preg_replace('#\[(.*?)\]#', '', $text);
-
-	$text = strip_tags($text, $keeptag);// $keeptag '<a><b><strong>' etc
-
-	if( strlen($text) > $charcount && $charcount != 0 )
-	{
-		$text = $text." ";
-		$text = substr($text,0,$charcount);
-		$text = substr($text,0,strrpos($text,' '));
-		if($charcount != 0) {
-		$text = $text." ...";
-		}
-	}
-	return $text;
-}
 
 /*
 Get elementor pages
