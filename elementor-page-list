@@ -48,6 +48,51 @@ add_action('admin_bar_menu', function($admin_bar)
 
 
 /*
+Elementor hook to add pages menu to editor panel
+*/
+add_action('elementor/documents/register_controls', function($document) 
+{
+  if( !$document instanceof \Elementor\Core\DocumentTypes\PageBase || !$document::get_property('has_elements') ) {
+    return;
+  }
+  
+	$e = new \Elementor\Controls_Manager;
+	$pgmenu= $blocksnav=[];
+			
+	foreach(elementorPages()->pages as $pgb) 
+	{
+		$pid = $pgb->post_id;
+		$ptitle = elementorPages($pid)->title;
+
+		$url = admin_url('post.php?post='.$pid.'&action=elementor');
+		if( !empty($ptitle) ) {
+			$lbl = ucfirst(truncText($ptitle,30));
+			$pgmenu[] = '<div><a href="'.$url.'">'.$lbl.'</a></div>';
+		}
+	}
+	
+	// pages list HTML in panel
+	$document->start_controls_section('maax_document_pagelist',[
+	'tab' => $f->tabsetting,
+	'label'=>'Pages'
+	]);
+		$pages = implode('',$pgmenu);
+		$pgblocks='';
+		if( !empty($blocksnav) )
+			$pgblocks = '<h3 style="margin-top: 30px; margin-bottom: 10px;">Page Blocks</h3>'.implode('',$blocksnav);
+		$dash = '<a href="'.get_admin_url().'" class="panelbtn">Exit Pagebuilder</a>';
+
+		$document->add_control('pages_list',[
+		'type' => $f->readme,
+		'raw'=>'<div class="panelpages">'.$pages.$dash.'</div>'
+		]);
+
+	$document->end_controls_section();
+  
+});
+
+
+/*
 Truncate function
 */
 function truncText($text, $charcount, $keeptag='')
@@ -103,4 +148,26 @@ function elementorPages($pid='')
   ];
   
   return $val;
+}
+
+
+/*
+CSS
+*/
+/*elementor page settings custom panel*/
+.panelpages a {
+	display: block; 
+	padding: 5px; 
+	border-bottom: 1px solid #2b2f33;
+}
+.panelpages .panelbtn {
+	background: #2b2f33; 
+	padding: 8px 6px; 
+	margin-top: 10px; 
+	border-radius: 3px; 
+	text-align: center;
+	border: none;
+}
+.panelpages .panelbtn:hover {
+	background: #111;
 }
