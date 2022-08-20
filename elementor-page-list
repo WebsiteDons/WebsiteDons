@@ -57,7 +57,7 @@ add_action('elementor/documents/register_controls', function($document)
   }
   
 	$e = new \Elementor\Controls_Manager;
-	$pgmenu= $blocksnav=[];
+	$pgmenu=[];
 			
 	foreach(elementorPages()->pages as $pgb) 
 	{
@@ -73,18 +73,15 @@ add_action('elementor/documents/register_controls', function($document)
 	
 	// pages list HTML in panel
 	$document->start_controls_section('maax_document_pagelist',[
-	'tab' => $f->tabsetting,
+	'tab' => $e::TAB_SETTING,
 	'label'=>'Pages'
 	]);
 		$pages = implode('',$pgmenu);
-		$pgblocks='';
-		if( !empty($blocksnav) )
-			$pgblocks = '<h3 style="margin-top: 30px; margin-bottom: 10px;">Page Blocks</h3>'.implode('',$blocksnav);
-		$dash = '<a href="'.get_admin_url().'" class="panelbtn">Exit Pagebuilder</a>';
+		$exit_editor = '<a href="'.get_admin_url().'" class="panelbtn">Exit Pagebuilder</a>';
 
 		$document->add_control('pages_list',[
-		'type' => $f->readme,
-		'raw'=>'<div class="panelpages">'.$pages.$dash.'</div>'
+		'type' => $e::RAW_HTML,
+		'raw'=>'<div class="panelpages">'.$pages.$exit_editor.'</div>'
 		]);
 
 	$document->end_controls_section();
@@ -152,7 +149,7 @@ function elementorPages($pid='')
 
 
 /*
-CSS
+CSS to be added to admin css file
 */
 /*elementor page settings custom panel*/
 .panelpages a {
@@ -171,3 +168,6 @@ CSS
 .panelpages .panelbtn:hover {
 	background: #111;
 }
+.panelpages h3 {
+ margin-top: 30px; margin-bottom: 10px;
+ }
